@@ -1,0 +1,93 @@
+Tema 3 Protocoale de Comunicatii - Frant Madalina 324CB
+
+A fost folosit drept schelet pentru rezolvarea acestei teme laboratorul 10 
+(protocolul HTTP) si solutia acestuia. 
+
+Pentru a parsa obiectele de tip JSON a fost folosita biblioteca parson
+recomandata in enunt pentru C (https://github.com/kgabis/parson), functiile 
+folosite fiind: json_value_init_object, json_value_get_object, 
+json_object_set_string, json_serialize_to_string_pretty, json_parse_string, 
+json_free_serialized_string, json_value_free. 
+
+Pe langa functiile compute_post_request si compute_get_request implementate 
+in cadrul laboratorului s-a mai definit si o functie compute_delete_request,
+asemenea functiei compute_get_request, care realizeaza o cerere de tip DELETE
+(in fisierul sursa requests.c si declarata in fisierul header requests.h).
+
+In cadrul fisierului client.c au fost implementate urmatoarele functii, ce au 
+ca rol validarea diferitelor tipuri de date:
+
+Functia validate primeste ca parametru un sir reprezentand un username sau o 
+parola si verifica daca este vid sau daca contine spatii, intorcand 1 pentru un 
+sir valid, respectiv 0 in caz contrar. 
+
+Functia valid_number primeste ca parametru un sir si verifica daca acesta este 
+format numai din cifre (este un numar natural), intorcand 1 pentru un numar valid, 
+respectiv 0 in caz contrar. 
+
+Functia is_empty verifica daca sirul dat drept parametru este vid sau este 
+format numai din spatii, intorcand 1 daca da, respectiv 0 in caz contrar. 
+
+In cadrul functiei main se asteapta comenzi de la tastura pana la introducerea 
+comenzii "exit", cand rularea este oprita. In functie de comanda introdusa, se 
+realizeaza operatiile corespunzatoare. Se declara 2 variabile: cookie si token, 
+al caror rol este de a retine cookie-ul de sesiune, dupa logare, respectiv 
+token-ul cu ajutorul caruia se face accesul la biblioteca. Initial ambele sunt 
+NULL, urmand a fi initializate dupa o comanda "login", respectiv "enter_library", 
+si redevenind NULL dupa comanda "logout". 
+
+In cazul comenzii "register" se asteapta input-ul utilizatorului pentru 
+username si parola, pana cand sunt introduse date valide, afisand un mesaj 
+de eroare corespunzator in cazul datelor invalide. Se creeaza obiectul 
+JSON cu valorile primite si se trimite cererea de tip POST la server. In 
+functie de raspunsul acestuia se afiseaza un mesaj de eroare (daca exista deja
+username-ul) sau de succes (contul a fost creat cu succes).
+
+In cazul comenzii "login" se verifica mai intai daca utilizatorul este deja logat 
+prin intermediul variabilei cookie, afisand un mesaj de eroare daca da. Daca nu, 
+se asteapta input-ul utilizatorului pentru username si parola, pana cand sunt 
+introduse date valide, afisand un mesaj de eroare corespunzator in cazul datelor 
+invalide. Se creeaza obiectul JSON cu valorile primite si se trimite cererea de 
+tip POST la server. In functie de raspunsul acestuia se afiseaza un mesaj de eroare 
+(daca nu exista un cont cu username-ul citit sau daca parola citita este gresita) 
+sau de succes (s-a realizat logarea in cont). Se retine si se afiseaza cookie-ul 
+de sesiune. 
+
+In cazul comenzii "enter_library" se verifica mai intai daca utilizatorul este 
+autentificat, afisand un mesaj de eroare daca nu. Daca este logat, atunci se 
+trimite o cerere de tip GET catre server pentru a obtine si afisa token-ul ce 
+demonstreaza accesul la biblioteca.
+
+In cazul comenzii "get_books" se verifica mai intai daca utilizatorul are acces 
+la biblioteca, afisand un mesaj de eroare daca nu. Altfel, se trimite o cerere de 
+tip GET catre server pentru a obtine si afisa lista de carti, sub forma unei 
+liste de obiecte JSON. 
+
+In cazul comenzii "get_book" se verifica mai intai daca utilizatorul are acces 
+la biblioteca, afisand un mesaj de eroare daca nu. Altfel, se asteapta input-ul 
+utilizatorului pentru ID-ul cartii cautate, pana cand este introdus un numar 
+valid, afisand un mesaj de eroare in cazul in care input-ul nu este un numar 
+valid. Se trimite o cerere de tip GET catre server, iar in functie de raspunsul 
+acestuia se afiseaza un mesaj de eroare, daca nu exista o carte cu ID-ul dat, 
+sau un mesaj de succes alaturi de datele cartii cautate in caz contrar.
+
+In cazul comenzii "add_book" se verifica mai intai daca utilizatorul are acces 
+la biblioteca, afisand un mesaj de eroare daca nu. Altfel, se asteapta input-ul 
+utilizatorului pentru datele cartii, pana cand acestea sunt valide, afisand un 
+mesaj de eroare corespunzator in cazul datelor invalide. Se creeaza obiectul JSON 
+cu valorile primite si se trimite cererea de tip POST la server. Daca a fost 
+adaugata cartea cu succes, atunci se afiseaza un mesaj corespunzator.
+
+In cazul comenzii "delete_book" se verifica mai intai daca utilizatorul are acces 
+la biblioteca, afisand un mesaj de eroare daca nu. Altfel, se asteapta input-ul 
+utilizatorului pentru ID-ul cartii cautate, pana cand este introdus un numar 
+valid, afisand un mesaj de eroare in cazul in care input-ul nu este un numar 
+valid. Se trimite o cerere de tip DELETE catre server, iar in functie de raspunsul 
+acestuia se afiseaza un mesaj de eroare, daca nu exista o carte cu ID-ul dat, 
+sau un mesaj de succes daca s-a reusit stergerea cartii.
+
+In cazul comenzii "logout" se verifica mai intai daca utilizatorul este 
+autentificat, afisand un mesaj de eroare daca nu. Se trimite o cerere de tip GET 
+catre server si se asteapta raspunsul acestuia. Daca s-a reusit delogarea, 
+atunci se afiseaza un mesaj corespunzator, iar variabilele cookie si token 
+devin NULL. 
